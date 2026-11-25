@@ -1,3 +1,4 @@
+import { Public } from '../common/auth/index.js';
 import { Controller, Get, Param, ParseUUIDPipe } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
@@ -15,6 +16,7 @@ import {
 import { GeografiaService } from './geografia.service.js';
 
 @ApiTags('Geografía')
+@Public()
 @Controller('geografia')
 export class GeografiaController {
   constructor(private readonly geografiaService: GeografiaService) {}

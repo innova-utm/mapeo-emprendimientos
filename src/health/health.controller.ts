@@ -1,3 +1,4 @@
+import { Public } from '../common/auth/index.js';
 import { Controller, Get } from '@nestjs/common';
 import {
   ApiOkResponse,
@@ -9,6 +10,7 @@ import { HealthResponseDto } from './dto/health-response.dto.js';
 import { HealthService } from './health.service.js';
 
 @ApiTags('Health')
+@Public()
 @Controller('health')
 export class HealthController {
   constructor(private readonly healthService: HealthService) {}

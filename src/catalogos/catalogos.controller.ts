@@ -1,9 +1,11 @@
+import { Public } from '../common/auth/index.js';
 import { Controller, Get } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CatalogosService } from './catalogos.service.js';
 import { CategoriaCatalogoDto, DocumentoLegalDto } from './dto/catalogo-response.dto.js';
 
 @ApiTags('Catálogos')
+@Public()
 @Controller('catalogos')
 export class CatalogosController {
   constructor(private readonly catalogosService: CatalogosService) {}

@@ -1,6 +1,7 @@
 import { existsSync } from 'node:fs';
-import { DataSource } from 'typeorm';
-import { EstadoRegistro } from '../common/enums/index.js';
+import bcrypt from 'bcrypt';
+import { DataSource, type EntityManager } from 'typeorm';
+import { EstadoRegistro, EstadoUsuario } from '../common/enums/index.js';
 import { CategoriaEmprendimiento } from '../emprendimientos/entities/categoria-emprendimiento.entity.js';
 import { Canton } from '../geografia/entities/canton.entity.js';
 import { Parroquia } from '../geografia/entities/parroquia.entity.js';
@@ -8,6 +9,7 @@ import { Provincia } from '../geografia/entities/provincia.entity.js';
 import { CategoriaProducto } from '../productos/entities/categoria-producto.entity.js';
 import { DocumentoLegal } from '../usuarios/entities/documento-legal.entity.js';
 import { Rol } from '../usuarios/entities/rol.entity.js';
+import { Usuario } from '../usuarios/entities/usuario.entity.js';
 import { ALL_ENTITIES } from './entities.js';
 
 if (existsSync('.env')) {
@@ -492,6 +494,48 @@ const GEOGRAFIA_ECUADOR_SEED: ProvinciaSeed[] = [
   },
 ];
 
+/**
+ * Crea (de forma idempotente) el administrador inicial. Credenciales desde .env;
+ * los valores por defecto solo se permiten fuera de producción.
+ */
+async function seedAdministrador(manager: EntityManager): Promise<void> {
+  const esProduccion = process.env.NODE_ENV === 'production';
+  const correo = (process.env.ADMIN_SEED_CORREO ?? (esProduccion ? '' : 'admin@mapeo.local'))
+    .trim()
+    .toLowerCase();
+  const contrasena = process.env.ADMIN_SEED_PASSWORD ?? (esProduccion ? '' : 'AdminDev2026-Seguro');
+  const telefono = process.env.ADMIN_SEED_TELEFONO ?? (esProduccion ? '' : '+593900000000');
+
+  if (!correo || !contrasena || !telefono) {
+    console.warn(
+      'ADMIN_SEED_CORREO, ADMIN_SEED_PASSWORD y ADMIN_SEED_TELEFONO son obligatorios en producción; se omite el administrador.',
+    );
+    return;
+  }
+
+  const usuarioRepo = manager.getRepository(Usuario);
+  if (await usuarioRepo.exists({ where: [{ correo }, { telefono }] })) {
+    console.log(`Administrador inicial ya existe (${correo}); sin cambios.`);
+    return;
+  }
+
+  const rol = await manager.getRepository(Rol).findOneByOrFail({ nombre: 'administrador' });
+  await usuarioRepo.save(
+    usuarioRepo.create({
+      rolId: rol.id,
+      nombres: 'Administrador',
+      apellidos: 'Plataforma',
+      telefono,
+      telefonoVerificado: true,
+      correo,
+      correoVerificado: true,
+      contrasena: await bcrypt.hash(contrasena, 12),
+      estado: EstadoUsuario.ACTIVO,
+    }),
+  );
+  console.log(`Administrador inicial creado (${correo}).`);
+}
+
 async function runSeed(): Promise<void> {
   const dataSource = new DataSource({
     type: 'postgres',
@@ -515,6 +559,8 @@ async function runSeed(): Promise<void> {
         .values(ROLES_SEED)
         .orIgnore()
         .execute();
+
+      await seedAdministrador(manager);
 
       await manager
         .createQueryBuilder()

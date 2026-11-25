@@ -1,6 +1,12 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { APP_GUARD } from '@nestjs/core';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AuthModule } from './auth/auth.module.js';
+import { AuthCommonModule, JwtAuthGuard, RolesGuard } from './common/auth/index.js';
+import { UsuariosModule } from './usuarios/usuarios.module.js';
+import { WhatsappModule } from './whatsapp/whatsapp.module.js';
 import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
 import { CatalogosModule } from './catalogos/catalogos.module.js';
@@ -37,11 +43,22 @@ import { HealthModule } from './health/health.module.js';
             : ['error'],
       }),
     }),
+    ThrottlerModule.forRoot([{ ttl: 60_000, limit: 100 }]),
+    AuthCommonModule,
+    WhatsappModule,
+    AuthModule,
+    UsuariosModule,
     HealthModule,
     CatalogosModule,
     GeografiaModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    // Orden de ejecución: rate limiting -> autenticación JWT -> roles (RNF-03/RNF-04).
+    { provide: APP_GUARD, useClass: ThrottlerGuard },
+    { provide: APP_GUARD, useClass: JwtAuthGuard },
+    { provide: APP_GUARD, useClass: RolesGuard },
+  ],
 })
 export class AppModule {}
