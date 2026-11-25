@@ -3,8 +3,11 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
+import { CatalogosModule } from './catalogos/catalogos.module.js';
 import { appConfig } from './config/app.config.js';
 import { databaseConfig } from './config/database.config.js';
+import { ALL_ENTITIES } from './database/entities.js';
+import { GeografiaModule } from './geografia/geografia.module.js';
 import { HealthModule } from './health/health.module.js';
 
 @Module({
@@ -23,6 +26,7 @@ import { HealthModule } from './health/health.module.js';
         username: configService.get<string>('database.username', 'postgres'),
         password: configService.get<string>('database.password', ''),
         database: configService.get<string>('database.database', 'mapeo_emprendimientos'),
+        entities: ALL_ENTITIES,
         autoLoadEntities: true,
         // REGLA CRÍTICA: la base de datos ya existe con el script físico SQL.
         synchronize: false,
@@ -34,6 +38,8 @@ import { HealthModule } from './health/health.module.js';
       }),
     }),
     HealthModule,
+    CatalogosModule,
+    GeografiaModule,
   ],
   controllers: [AppController],
   providers: [AppService],
