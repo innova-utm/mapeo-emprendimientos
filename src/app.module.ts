@@ -16,6 +16,8 @@ import { ALL_ENTITIES } from './database/entities.js';
 import { EmprendimientosModule } from './emprendimientos/emprendimientos.module.js';
 import { GeografiaModule } from './geografia/geografia.module.js';
 import { HealthModule } from './health/health.module.js';
+import { PedidosModule } from './pedidos/pedidos.module.js';
+import { ProductosModule } from './productos/productos.module.js';
 import { StorageModule } from './storage/storage.module.js';
 import { UbicacionesModule } from './ubicaciones/ubicaciones.module.js';
 
@@ -57,6 +59,8 @@ import { UbicacionesModule } from './ubicaciones/ubicaciones.module.js';
     HealthModule,
     CatalogosModule,
     GeografiaModule,
+    ProductosModule,
+    PedidosModule,
   ],
   controllers: [AppController],
   providers: [
