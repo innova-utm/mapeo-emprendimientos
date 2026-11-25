@@ -1,5 +1,5 @@
 import { mkdir, unlink, writeFile } from 'node:fs/promises';
-import { dirname, isAbsolute, join, relative, resolve } from 'node:path';
+import { dirname, isAbsolute, relative, resolve } from 'node:path';
 import type { StorageAdapter } from './storage.interface.js';
 
 export class LocalStorageAdapter implements StorageAdapter {

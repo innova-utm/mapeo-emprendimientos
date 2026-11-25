@@ -13,8 +13,11 @@ import { CatalogosModule } from './catalogos/catalogos.module.js';
 import { appConfig } from './config/app.config.js';
 import { databaseConfig } from './config/database.config.js';
 import { ALL_ENTITIES } from './database/entities.js';
+import { EmprendimientosModule } from './emprendimientos/emprendimientos.module.js';
 import { GeografiaModule } from './geografia/geografia.module.js';
 import { HealthModule } from './health/health.module.js';
+import { StorageModule } from './storage/storage.module.js';
+import { UbicacionesModule } from './ubicaciones/ubicaciones.module.js';
 
 @Module({
   imports: [
@@ -45,9 +48,12 @@ import { HealthModule } from './health/health.module.js';
     }),
     ThrottlerModule.forRoot([{ ttl: 60_000, limit: 100 }]),
     AuthCommonModule,
+    StorageModule,
     WhatsappModule,
     AuthModule,
     UsuariosModule,
+    EmprendimientosModule,
+    UbicacionesModule,
     HealthModule,
     CatalogosModule,
     GeografiaModule,
