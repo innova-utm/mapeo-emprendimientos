@@ -7,9 +7,20 @@ export function assertJwtSecret(secret: string | undefined): void {
   }
 }
 
+const DEFAULT_CORS_ORIGINS =
+  'http://localhost:8100,http://localhost:4200,capacitor://localhost,http://localhost';
+
 function parsePositiveInt(value: string | undefined, fallback: number): number {
   const parsed = Number.parseInt(value ?? '', 10);
   return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
+}
+
+function parseCorsOrigins(value: string | undefined): string[] {
+  const raw = value?.trim() || DEFAULT_CORS_ORIGINS;
+  return raw
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter((origin) => origin.length > 0);
 }
 
 export const appConfig = registerAs('app', () => {
@@ -17,6 +28,7 @@ export const appConfig = registerAs('app', () => {
   return {
     nodeEnv: process.env.NODE_ENV ?? 'development',
     port: Number.parseInt(process.env.PORT ?? '3000', 10),
+    corsOrigins: parseCorsOrigins(process.env.CORS_ORIGINS),
     jwtSecret,
     jwtRefreshSecret: process.env.JWT_REFRESH_SECRET || `${jwtSecret}:refresh`,
     jwtAccessTtl: parsePositiveInt(process.env.JWT_ACCESS_TTL_SECONDS, 900),

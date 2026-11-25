@@ -3,8 +3,12 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AdminModule } from './admin/admin.module.js';
 import { AuthModule } from './auth/auth.module.js';
 import { AuthCommonModule, JwtAuthGuard, RolesGuard } from './common/auth/index.js';
+import { FavoritosModule } from './favoritos/favoritos.module.js';
+import { ReportesModule } from './reportes/reportes.module.js';
+import { ResenasModule } from './resenas/resenas.module.js';
 import { UsuariosModule } from './usuarios/usuarios.module.js';
 import { WhatsappModule } from './whatsapp/whatsapp.module.js';
 import { AppController } from './app.controller.js';
@@ -61,6 +65,10 @@ import { UbicacionesModule } from './ubicaciones/ubicaciones.module.js';
     GeografiaModule,
     ProductosModule,
     PedidosModule,
+    FavoritosModule,
+    ResenasModule,
+    ReportesModule,
+    AdminModule,
   ],
   controllers: [AppController],
   providers: [
